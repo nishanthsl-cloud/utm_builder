@@ -208,7 +208,7 @@ const CONTENT_OPTIONS = [
 ];
 
 const CHANNELS = [
-  { id: "paid_social",   label: "Paid social",   medium: "paid-social", sourceOptions: ["linkedin","twitter","facebook"], contentMode: "optional" },
+  { id: "paid_social",   label: "Paid social",   medium: "paid-social", sourceOptions: ["linkedin","twitter","facebook","youtube","instagram"], contentMode: "optional" },
   { id: "organic_social", label: "Organic social", medium: "social",     sourceOptions: ["linkedin","twitter","facebook"], contentMode: "optional" },
   { id: "paid_search",   label: "Paid search",   medium: "paid-search", sourceOptions: ["google","bing"], contentMode: "optional" },
   { id: "email_invite_hubspot",  label: "Email invite [HubSpot]",  medium: "email", source: "hubspot",  contentMode: "required" },
@@ -221,7 +221,8 @@ const CHANNELS = [
   { id: "website_banner", label: "Website banner", medium: "direct", source: "home", contentMode: "optional" },
   { id: "webinar_promo",  label: "Webinar promo",  medium: "webinar", source: "sequel", contentMode: "optional" },
   { id: "event_promo",    label: "Event promo",    medium: "event",   sourceOptions: ["speaker","community","booth-qr"], contentMode: "optional" },
-  { id: "content_syndication", label: "Content syndication", medium: "email", source: "hubspot", contentMode: "required" }
+  { id: "content_syndication", label: "Content syndication", medium: "email", source: "hubspot", contentMode: "required" },
+  { id: "community", label: "Community", medium: "community", sourceOptions: ["linkedin","instagram","youtube","newsletter","website","reddit"], contentMode: "optional" }
 ];
 
 const EXAMPLE = {
