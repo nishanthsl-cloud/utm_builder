@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTM Builder</title>
+<style>
+  :root {
+    --primary: #2770EF;
+    --primary-dark: #1D5BC4;
+    --text: #1D232F;
+    --text-muted: #5B6472;
+    --panel: #F6F8FA;
+    --border: #C0C6CF;
+    --danger: #D64545;
+    --danger-bg: #FDECEC;
+    --ok-bg: #EAF3FF;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arimo, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    background: #fff;
+    margin: 0;
+    padding: 32px 24px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .sub { color: var(--text-muted); margin: 0 0 24px; font-size: 14px; }
+
+  .panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .grid-top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 900px) { .grid-top { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .grid-top { grid-template-columns: 1fr; } }
+
+  label.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  label.field-label .req { color: var(--danger); }
+
+  input[type="text"], input[type="url"], select, textarea {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+  }
+  input.invalid, select.invalid { border-color: var(--danger); }
+
+  .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .err { font-size: 12px; color: var(--danger); margin-top: 4px; display: none; }
+  .err.show { display: block; }
+
+  .channels-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; margin: 20px 0 4px; }
+  .channels-err { font-size: 12px; color: var(--danger); margin-bottom: 10px; display: none; }
+  .channels-err.show { display: block; }
+
+  .channel-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 900px) { .channel-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .channel-grid { grid-template-columns: 1fr; } }
+
+  .chan-tile {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    transition: border-color .1s, background .1s;
+  }
+  .chan-tile.checked { border-color: var(--primary); background: var(--ok-bg); }
+  .chan-head { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+  .chan-head input[type="checkbox"] { margin-top: 2px; }
+  .chan-title { font-weight: 700; font-size: 14px; }
+  .chan-meta { font-size: 11px; color: var(--text-muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; margin-top: 2px; }
+  .chan-sub { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .chan-sub label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; display: block; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+  }
+  button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+  button.primary:hover { background: var(--primary-dark); }
+  button:hover { background: #F0F2F5; }
+  button.primary:hover { background: var(--primary-dark); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--panel); font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+  tr.dup { background: var(--danger-bg); }
+  .url-mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; word-break: break-all; color: var(--primary-dark); }
+  .row-copy { font-size: 12px; padding: 4px 10px; }
+
+  .empty-state { color: var(--text-muted); font-size: 14px; text-align: center; padding: 40px 20px; border: 1px dashed var(--border); border-radius: var(--radius); }
+
+  .all-urls-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  #allUrls { width: 100%; height: 110px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; padding: 10px; resize: vertical; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--text); color: #fff;
+    padding: 10px 16px; border-radius: 6px; font-size: 13px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .log-status { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .log-status.err { color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>UTM Builder</h1>
+  <p class="sub">Fill the form, pick channels, get correctly formatted tagged URLs. Live preview below.</p>
+
+  <div class="panel">
+    <div class="grid-top">
+      <div>
+        <label class="field-label">Your Name / Email <span class="req">*</span></label>
+        <input type="text" id="userName" placeholder="e.g. nishanth@thoughtspot.com">
+        <div class="err" id="err-userName">Enter your name or email — used for the tracking log.</div>
+      </div>
+      <div>
+        <label class="field-label">Campaign Type <span class="req">*</span></label>
+        <select id="campaignType">
+          <option value="">Select...</option>
+          <option value="Event">Event</option>
+          <option value="Webinar">Webinar</option>
+          <option value="Content Syndication">Content Syndication</option>
+          <option value="Newsletter">Newsletter</option>
+          <option value="Website">Website</option>
+        </select>
+        <div class="hint">For filtering/tracking only — does not affect the tagged URL.</div>
+        <div class="err" id="err-campaignType">Select a campaign type.</div>
+      </div>
+      <div>
+        <label class="field-label">Campaign Name <span class="req">*</span></label>
+        <input type="text" id="campaignName" placeholder="e.g. q3-databricks-webinar">
+        <div class="hint">Must match the SFDC campaign name exactly. Lowercase letters, numbers, hyphens; spaces and underscores auto-convert.</div>
+        <div class="err" id="err-campaignName">Enter a campaign name.</div>
+      </div>
+      <div>
+        <label class="field-label">Destination URL <span class="req">*</span></label>
+        <input type="text" id="destUrl" placeholder="https://example.com/page">
+        <div class="err" id="err-destUrl">Enter a valid https:// URL.</div>
+      </div>
+    </div>
+
+    <div class="channels-label">Channels <span class="req">*</span></div>
+    <div class="channels-err" id="err-channels">Pick at least one channel.</div>
+    <div class="channel-grid" id="channelGrid"></div>
+
+    <div class="btn-row">
+      <button id="loadExampleBtn">Load example</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <div id="resultsArea"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ======================= CONFIG ======================= */
+const CONFIG = {
+  ENDPOINT_URL: "/api/log"
+};
+
+/* ======================= TAXONOMY ======================= */
+const CONTENT_OPTIONS = [
+  "newsletter","nurture","post-event","post-webinar","pre-event","pre-webinar",
+  "executive-outreach","on-demand","post-content-download","auto-responder","demo"
+];
+
+const CHANNELS = [
+  { id: "paid_social",   label: "Paid social",   medium: "paid-social", sourceOptions: ["linkedin","twitter","facebook"], contentMode: "optional" },
+  { id: "organic_social", label: "Organic social", medium: "social",     sourceOptions: ["linkedin","twitter","facebook"], contentMode: "optional" },
+  { id: "paid_search",   label: "Paid search",   medium: "paid-search", sourceOptions: ["google","bing"], contentMode: "optional" },
+  { id: "email_invite_hubspot",  label: "Email invite [HubSpot]",  medium: "email", source: "hubspot",  contentMode: "required" },
+  { id: "email_invite_sendgrid", label: "Email invite [SendGrid]", medium: "email", source: "sendgrid", contentMode: "required" },
+  { id: "email_reminder", label: "Email reminder", medium: "email", source: "hubspot", contentMode: "required" },
+  { id: "email_nurture",  label: "Email nurture",  medium: "email", source: "hubspot", contentMode: "required" },
+  { id: "partner_email",  label: "Partner email",  medium: "email", source: "hubspot", contentMode: "required" },
+  { id: "partner_website", label: "Partner website", medium: "referral", source: "partner", contentMode: "optional" },
+  { id: "sales_outreach", label: "Sales outreach", medium: "direct", source: "sales_sdr", contentMode: "optional" },
+  { id: "website_banner", label: "Website banner", medium: "direct", source: "home", contentMode: "optional" },
+  { id: "webinar_promo",  label: "Webinar promo",  medium: "webinar", source: "sequel", contentMode: "optional" },
+  { id: "event_promo",    label: "Event promo",    medium: "event",   sourceOptions: ["speaker","community","booth-qr"], contentMode: "optional" },
+  { id: "content_syndication", label: "Content syndication", medium: "email", source: "hubspot", contentMode: "required" }
+];
+
+const EXAMPLE = {
+  userName: "jane.doe@thoughtspot.com",
+  campaignType: "Webinar",
+  campaignName: "tableautakeout",
+  destUrl: "https://go.thoughtspot.com/webinar",
+  channel: "email_invite_hubspot",
+  content: "pre-webinar"
+};
+
+/* ======================= STATE ======================= */
+let state = {}; // channelId -> { source, content, term }
+
+/* ======================= HELPERS ======================= */
+function cleanValue(v, { keepCaseTokens = [] } = {}) {
+  if (v == null) return "";
+  let s = String(v).trim();
+  s = s.replace(/[\s_]+/g, "-");           // spaces/underscores -> hyphen
+  s = s.replace(/-+/g, "-");               // collapse repeats
+  s = s.replace(/^-+|-+$/g, "");           // strip leading/trailing
+  // lowercase unless token is an exact-match keep-case token (e.g. region codes)
+  const upperTokens = ["NA","EMEA","APAC"];
+  const parts = s.split("-").map(p => upperTokens.includes(p.toUpperCase()) ? p.toUpperCase() : p.toLowerCase());
+  s = parts.join("-");
+  return s;
+}
+
+function isValidHttpsUrl(v) {
+  try {
+    const u = new URL(v);
+    return u.protocol === "https:";
+  } catch { return false; }
+}
+
+function buildFinalUrl(destUrl, params) {
+  const order = ["utm_source","utm_medium","utm_term","utm_content","utm_campaign"];
+  const qs = order
+    .filter(k => params[k])
+    .map(k => `${k}=${encodeURIComponent(params[k])}`)
+    .join("&");
+  return qs ? `${destUrl}${destUrl.includes("?") ? "&" : "?"}${qs}` : destUrl;
+}
+
+/* ======================= RENDER CHANNEL GRID ======================= */
+const grid = document.getElementById("channelGrid");
+CHANNELS.forEach(ch => {
+  const tile = document.createElement("div");
+  tile.className = "chan-tile";
+  tile.id = `tile-${ch.id}`;
+
+  const metaParts = [`medium=${ch.medium}`];
+  if (ch.source) metaParts.push(`source=${ch.source}`);
+
+  tile.innerHTML = `
+    <label class="chan-head">
+      <input type="checkbox" data-chan="${ch.id}">
+      <div>
+        <div class="chan-title">${ch.label}</div>
+        <div class="chan-meta">${metaParts.join(" &middot; ")}</div>
+      </div>
+    </label>
+    <div class="chan-sub" id="sub-${ch.id}" style="display:none;"></div>
+  `;
+  grid.appendChild(tile);
+});
+
+function renderSubfields(ch) {
+  const sub = document.getElementById(`sub-${ch.id}`);
+  let html = "";
+  if (ch.sourceOptions) {
+    html += `<div><label>Source</label><select data-field="source" data-chan="${ch.id}">
+      <option value="">Select...</option>
+      ${ch.sourceOptions.map(s => `<option value="${s}">${s}</option>`).join("")}
+    </select></div>`;
+  }
+  if (ch.contentMode === "required") {
+    html += `<div><label>Content <span class="req">*</span></label><select data-field="content" data-chan="${ch.id}">
+      <option value="">Select...</option>
+      ${CONTENT_OPTIONS.map(c => `<option value="${c}">${c}</option>`).join("")}
+    </select><div class="err show" data-content-err="${ch.id}" style="display:none;">Content is required for this channel.</div></div>`;
+  } else {
+    html += `<div><label>Content (optional)</label><input type="text" data-field="content" data-chan="${ch.id}"></div>`;
+  }
+  html += `<div><label>Term (optional)</label><input type="text" data-field="term" data-chan="${ch.id}"></div>`;
+  sub.innerHTML = html;
+}
+
+CHANNELS.forEach(ch => {
+  const checkbox = document.querySelector(`input[data-chan="${ch.id}"]`);
+  checkbox.addEventListener("change", () => {
+    const tile = document.getElementById(`tile-${ch.id}`);
+    const sub = document.getElementById(`sub-${ch.id}`);
+    if (checkbox.checked) {
+      tile.classList.add("checked");
+      sub.style.display = "flex";
+      if (!sub.innerHTML) renderSubfields(ch);
+      state[ch.id] = state[ch.id] || {};
+    } else {
+      tile.classList.remove("checked");
+      sub.style.display = "none";
+      delete state[ch.id];
+    }
+    renderResults();
+  });
+});
+
+grid.addEventListener("input", handleSubfieldChange);
+grid.addEventListener("change", handleSubfieldChange);
+function handleSubfieldChange(e) {
+  const field = e.target.dataset.field;
+  const chan = e.target.dataset.chan;
+  if (!field || !chan) return;
+  state[chan] = state[chan] || {};
+  state[chan][field] = e.target.value;
+  renderResults();
+}
+
+/* ======================= TOP FIELD LISTENERS ======================= */
+["userName","campaignType","campaignName","destUrl"].forEach(id => {
+  document.getElementById(id).addEventListener("input", renderResults);
+  document.getElementById(id).addEventListener("change", renderResults);
+});
+
+/* ======================= VALIDATION + RENDER ======================= */
+function renderResults() {
+  const userName = document.getElementById("userName").value.trim();
+  const campaignType = document.getElementById("campaignType").value;
+  const rawCampaignName = document.getElementById("campaignName").value;
+  const destUrl = document.getElementById("destUrl").value.trim();
+  const cleanCampaignName = cleanValue(rawCampaignName);
+
+  const checkedChannels = CHANNELS.filter(ch => document.querySelector(`input[data-chan="${ch.id}"]`).checked);
+
+  // field-level validation display
+  setErr("userName", !userName);
+  setErr("campaignType", !campaignType);
+  setErr("campaignName", !cleanCampaignName);
+  setErr("destUrl", destUrl && !isValidHttpsUrl(destUrl));
+  document.getElementById("err-destUrl").textContent = !destUrl ? "Enter a valid https:// URL." : "Enter a valid https:// URL.";
+  if (!destUrl) setErr("destUrl", true);
+
+  const channelsErr = document.getElementById("err-channels");
+  channelsErr.classList.toggle("show", checkedChannels.length === 0);
+
+  // per-channel sub-validation
+  let channelsValid = checkedChannels.length > 0;
+  checkedChannels.forEach(ch => {
+    const s = state[ch.id] || {};
+    if (ch.sourceOptions && !s.source) channelsValid = false;
+    if (ch.contentMode === "required") {
+      const errEl = document.querySelector(`[data-content-err="${ch.id}"]`);
+      const bad = !s.content;
+      if (errEl) errEl.style.display = bad ? "block" : "none";
+      if (bad) channelsValid = false;
+    }
+  });
+
+  const formValid = userName && campaignType && cleanCampaignName && destUrl && isValidHttpsUrl(destUrl) && channelsValid;
+
+  const resultsArea = document.getElementById("resultsArea");
+  if (!formValid) {
+    resultsArea.innerHTML = `<div class="empty-state">Complete the form above — name, campaign type, campaign name, destination URL, and at least one fully-filled channel — to see the tagged URLs.</div>`;
+    return;
+  }
+
+  const rows = checkedChannels.map(ch => {
+    const s = state[ch.id] || {};
+    const source = ch.source || s.source;
+    const params = {
+      utm_source: cleanValue(source),
+      utm_medium: cleanValue(ch.medium),
+      utm_term: s.term ? cleanValue(s.term) : "",
+      utm_content: s.content ? cleanValue(s.content) : "",
+      utm_campaign: cleanCampaignName
+    };
+    const finalUrl = buildFinalUrl(destUrl, params);
+    return { channel: ch.label, campaignType, destUrl, params, finalUrl };
+  });
+
+  // duplicate detection
+  const urlCounts = {};
+  rows.forEach(r => { urlCounts[r.finalUrl] = (urlCounts[r.finalUrl] || 0) + 1; });
+
+  resultsArea.innerHTML = renderTable(rows, urlCounts, userName);
+  wireRowButtons(rows, urlCounts, userName);
+}
+
+function setErr(id, isBad) {
+  document.getElementById(id).classList.toggle("invalid", !!isBad);
+  document.getElementById(`err-${id}`).classList.toggle("show", !!isBad);
+}
+
+function renderTable(rows, urlCounts, userName) {
+  const trs = rows.map((r, i) => {
+    const isDup = urlCounts[r.finalUrl] > 1;
+    return `<tr class="${isDup ? 'dup' : ''}">
+      <td>${r.channel}</td>
+      <td>${r.params.utm_campaign}</td>
+      <td>${r.params.utm_medium}</td>
+      <td>${r.params.utm_source}</td>
+      <td>${r.params.utm_content || "&mdash;"}</td>
+      <td>${r.params.utm_term || "&mdash;"}</td>
+      <td><span class="url-mono">${r.finalUrl}</span></td>
+      <td><button class="row-copy" data-row="${i}">Copy</button></td>
+    </tr>`;
+  }).join("");
+
+  const allUrls = rows.map(r => r.finalUrl).join("\n");
+
+  return `
+    <div class="panel">
+      <h3 style="margin-top:0;">Tagged URLs <span style="color:var(--text-muted); font-weight:400; font-size:13px;">${rows.length} row${rows.length !== 1 ? "s" : ""}</span></h3>
+      <table>
+        <thead><tr>
+          <th>Channel</th><th>utm_campaign</th><th>utm_medium</th><th>utm_source</th>
+          <th>utm_content</th><th>utm_term</th><th>Final Tagged URL</th><th></th>
+        </tr></thead>
+        <tbody>${trs}</tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="all-urls-head">
+        <strong style="font-size:14px;">All URLs — select all and copy</strong>
+        <button id="copyAllBtn" class="primary">Copy all &amp; log</button>
+      </div>
+      <textarea id="allUrls" readonly>${allUrls}</textarea>
+      <div class="log-status" id="logStatus"></div>
+    </div>
+  `;
+}
+
+function wireRowButtons(rows, urlCounts, userName) {
+  document.querySelectorAll(".row-copy").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const r = rows[parseInt(btn.dataset.row, 10)];
+      navigator.clipboard.writeText(r.finalUrl);
+      showToast("Copied to clipboard");
+      logRows([r], userName);
+    });
+  });
+  const copyAllBtn = document.getElementById("copyAllBtn");
+  if (copyAllBtn) {
+    copyAllBtn.addEventListener("click", () => {
+      const text = rows.map(r => r.finalUrl).join("\n");
+      navigator.clipboard.writeText(text);
+      showToast("All URLs copied");
+      logRows(rows, userName);
+    });
+  }
+}
+
+/* ======================= LOGGING TO GOOGLE SHEET ======================= */
+function logRows(rows, userName) {
+  const statusEl = document.getElementById("logStatus");
+  if (statusEl) { statusEl.textContent = "Logging…"; statusEl.classList.remove("err"); }
+  const payload = {
+    rows: rows.map(r => ({
+      user: userName,
+      channel: r.channel,
+      campaignType: r.campaignType,
+      utm_campaign: r.params.utm_campaign,
+      utm_medium: r.params.utm_medium,
+      utm_source: r.params.utm_source,
+      utm_content: r.params.utm_content,
+      utm_term: r.params.utm_term,
+      destinationUrl: r.destUrl,
+      finalUrl: r.finalUrl
+    }))
+  };
+  fetch(CONFIG.ENDPOINT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!statusEl) return;
+    if (data.status === "ok") {
+      statusEl.textContent = `Logged ${data.logged} row${data.logged !== 1 ? "s" : ""} to tracking sheet.`;
+      statusEl.classList.remove("err");
+    } else {
+      statusEl.textContent = `Logging failed: ${data.message || "unknown error"}`;
+      statusEl.classList.add("err");
+    }
+  })
+  .catch(() => {
+    if (statusEl) { statusEl.textContent = "Logging failed — server unreachable."; statusEl.classList.add("err"); }
+  });
+}
+
+/* ======================= TOAST ======================= */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+/* ======================= LOAD EXAMPLE / RESET ======================= */
+document.getElementById("loadExampleBtn").addEventListener("click", () => {
+  document.getElementById("userName").value = EXAMPLE.userName;
+  document.getElementById("campaignType").value = EXAMPLE.campaignType;
+  document.getElementById("campaignName").value = EXAMPLE.campaignName;
+  document.getElementById("destUrl").value = EXAMPLE.destUrl;
+
+  document.querySelectorAll('input[type="checkbox"][data-chan]').forEach(cb => {
+    const shouldCheck = cb.dataset.chan === EXAMPLE.channel;
+    if (cb.checked !== shouldCheck) { cb.checked = shouldCheck; cb.dispatchEvent(new Event("change")); }
+  });
+  state[EXAMPLE.channel] = { content: EXAMPLE.content };
+  const contentField = document.querySelector(`[data-field="content"][data-chan="${EXAMPLE.channel}"]`);
+  if (contentField) contentField.value = EXAMPLE.content;
+
+  renderResults();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  document.getElementById("userName").value = "";
+  document.getElementById("campaignType").value = "";
+  document.getElementById("campaignName").value = "";
+  document.getElementById("destUrl").value = "";
+  document.querySelectorAll('input[type="checkbox"][data-chan]').forEach(cb => {
+    if (cb.checked) { cb.checked = false; cb.dispatchEvent(new Event("change")); }
+  });
+  state = {};
+  renderResults();
+});
+
+renderResults();
+</script>
+</body>
+</html>

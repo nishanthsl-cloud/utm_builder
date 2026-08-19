@@ -1,0 +1,16 @@
+{
+  "name": "utm-builder",
+  "version": "1.0.0",
+  "description": "UTM Builder with server-side Google Sheets logging",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "googleapis": "^140.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
