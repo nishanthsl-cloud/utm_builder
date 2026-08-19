@@ -367,20 +367,22 @@ function renderResults() {
   const channelsErr = document.getElementById("err-channels");
   channelsErr.classList.toggle("show", checkedChannels.length === 0);
 
-  // per-channel sub-validation
-  let channelsValid = checkedChannels.length > 0;
+  // per-channel sub-validation — track which channels are complete
+  let anyChannelValid = false;
   checkedChannels.forEach(ch => {
     const s = state[ch.id] || {};
-    if (ch.sourceOptions && !s.source) channelsValid = false;
+    let chValid = true;
+    if (ch.sourceOptions && !s.source) chValid = false;
     if (ch.contentMode === "required") {
       const errEl = document.querySelector(`[data-content-err="${ch.id}"]`);
       const bad = !s.content;
       if (errEl) errEl.style.display = bad ? "block" : "none";
-      if (bad) channelsValid = false;
+      if (bad) chValid = false;
     }
+    if (chValid) anyChannelValid = true;
   });
 
-  const formValid = userName && campaignType && cleanCampaignName && destUrl && isValidHttpsUrl(destUrl) && channelsValid;
+  const formValid = userName && campaignType && cleanCampaignName && destUrl && isValidHttpsUrl(destUrl) && checkedChannels.length > 0 && anyChannelValid;
 
   const resultsArea = document.getElementById("resultsArea");
   if (!formValid) {
@@ -388,7 +390,15 @@ function renderResults() {
     return;
   }
 
-  const rows = checkedChannels.map(ch => {
+  // only include channels that are fully complete
+  const validChannels = checkedChannels.filter(ch => {
+    const s = state[ch.id] || {};
+    if (ch.sourceOptions && !s.source) return false;
+    if (ch.contentMode === "required" && !s.content) return false;
+    return true;
+  });
+
+  const rows = validChannels.map(ch => {
     const s = state[ch.id] || {};
     const source = ch.source || s.source;
     const params = {
