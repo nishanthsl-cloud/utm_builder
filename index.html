@@ -477,7 +477,6 @@ function wireRowButtons(rows, urlCounts, userName) {
       const r = rows[parseInt(btn.dataset.row, 10)];
       navigator.clipboard.writeText(r.finalUrl);
       showToast("Copied to clipboard");
-      logRows([r], userName);
     });
   });
   const copyAllBtn = document.getElementById("copyAllBtn");
