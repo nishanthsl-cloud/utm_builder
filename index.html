@@ -237,6 +237,8 @@ const EXAMPLE = {
 
 /* ======================= STATE ======================= */
 let state = {}; // channelId -> { source, content, term }
+const loggedUrls = new Set();
+let autoLogTimer = null;
 
 /* ======================= HELPERS ======================= */
 function cleanValue(v, { keepCaseTokens = [] } = {}) {
