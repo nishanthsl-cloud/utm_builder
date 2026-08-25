@@ -492,7 +492,15 @@ function wireRowButtons(rows, urlCounts, userName) {
 }
 
 /* ======================= LOGGING TO GOOGLE SHEET ======================= */
-function logRows(rows, userName) {
+function autoLogRows(rows, userName) {
+  const newRows = rows.filter(r => !loggedUrls.has(r.finalUrl));
+  if (!newRows.length) return;
+  logRows(newRows, userName, () => {
+    newRows.forEach(r => loggedUrls.add(r.finalUrl));
+  });
+}
+
+function logRows(rows, userName, onSuccess) {
   const statusEl = document.getElementById("logStatus");
   if (statusEl) { statusEl.textContent = "Logging…"; statusEl.classList.remove("err"); }
   const payload = {
