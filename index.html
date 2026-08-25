@@ -526,8 +526,9 @@ function logRows(rows, userName, onSuccess) {
   .then(data => {
     if (!statusEl) return;
     if (data.status === "ok") {
-      statusEl.textContent = `Logged ${data.logged} row${data.logged !== 1 ? "s" : ""} to tracking sheet.`;
+      statusEl.textContent = `Logged to tracking sheet (${data.logged} row${data.logged !== 1 ? "s" : ""}).`;
       statusEl.classList.remove("err");
+      if (onSuccess) onSuccess();
     } else {
       statusEl.textContent = `Logging failed: ${data.message || "unknown error"}`;
       statusEl.classList.add("err");
