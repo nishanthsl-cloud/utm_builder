@@ -422,6 +422,9 @@ function renderResults() {
 
   resultsArea.innerHTML = renderTable(rows, urlCounts, userName);
   wireRowButtons(rows, urlCounts, userName);
+
+  clearTimeout(autoLogTimer);
+  autoLogTimer = setTimeout(() => autoLogRows(rows, userName), 1500);
 }
 
 function setErr(id, isBad) {
