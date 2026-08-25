@@ -485,7 +485,6 @@ function wireRowButtons(rows, urlCounts, userName) {
       const text = rows.map(r => r.finalUrl).join("\n");
       navigator.clipboard.writeText(text);
       showToast("All URLs copied");
-      logRows(rows, userName);
     });
   }
 }
