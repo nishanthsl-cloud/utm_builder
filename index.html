@@ -459,6 +459,10 @@ function renderResults() {
 
   const checkedChannels = CHANNELS.filter(ch => document.querySelector(`input[data-chan="${ch.id}"]`).checked);
 
+  const isPodcast = campaignType === "Podcast";
+  const episodeRaw = document.getElementById("episodeNumber").value;
+  const episodeValid = !isPodcast || isValidEpisodeNumber(episodeRaw);
+
   // field-level validation display
   setErr("userName", !userName);
   setErr("campaignType", !campaignType);
@@ -466,6 +470,7 @@ function renderResults() {
   setErr("destUrl", destUrl && !isValidHttpsUrl(destUrl));
   document.getElementById("err-destUrl").textContent = !destUrl ? "Enter a valid https:// URL." : "Enter a valid https:// URL.";
   if (!destUrl) setErr("destUrl", true);
+  setErr("episodeNumber", isPodcast && !episodeValid);
 
   const channelsErr = document.getElementById("err-channels");
   channelsErr.classList.toggle("show", checkedChannels.length === 0);
