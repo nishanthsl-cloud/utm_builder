@@ -260,9 +260,10 @@ const EXAMPLE = {
 };
 
 /* ======================= STATE ======================= */
-let state = {}; // channelId -> { source, content, term }
+let state = {}; // channelId -> { source, content, term, termAuto }
 const loggedUrls = new Set();
 let autoLogTimer = null;
+let podcastLastToken = null; // last known valid "ep-N" token, used to detect/refresh auto-filled Terms
 
 /* ======================= HELPERS ======================= */
 function cleanValue(v, { keepCaseTokens = [] } = {}) {
