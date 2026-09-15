@@ -286,6 +286,15 @@ function isValidHttpsUrl(v) {
   } catch { return false; }
 }
 
+function isValidEpisodeNumber(v) {
+  const s = String(v == null ? "" : v).trim();
+  return /^[0-9]+$/.test(s) && parseInt(s, 10) >= 1;
+}
+
+function episodeToken(v) {
+  return isValidEpisodeNumber(v) ? `ep-${parseInt(v, 10)}` : null;
+}
+
 function buildFinalUrl(destUrl, params) {
   const order = ["utm_source","utm_medium","utm_term","utm_content","utm_campaign"];
   const qs = order
