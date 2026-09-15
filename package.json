@@ -4,11 +4,15 @@
   "description": "UTM Builder with server-side Google Sheets logging",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/"
   },
   "dependencies": {
     "express": "^4.19.2",
     "googleapis": "^140.0.0"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
   },
   "engines": {
     "node": ">=20"
