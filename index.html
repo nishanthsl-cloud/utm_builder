@@ -367,6 +367,7 @@ CHANNELS.forEach(ch => {
       sub.style.display = "flex";
       if (!sub.innerHTML) renderSubfields(ch);
       state[ch.id] = state[ch.id] || {};
+      maybePrefillTerm(ch.id);
     } else {
       tile.classList.remove("checked");
       sub.style.display = "none";
