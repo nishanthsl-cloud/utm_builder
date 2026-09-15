@@ -166,13 +166,8 @@
         <label class="field-label">Campaign Type <span class="req">*</span></label>
         <select id="campaignType">
           <option value="">Select...</option>
-          <option value="Event">Event</option>
-          <option value="Webinar">Webinar</option>
-          <option value="Content Syndication">Content Syndication</option>
-          <option value="Newsletter">Newsletter</option>
-          <option value="Website">Website</option>
         </select>
-        <div class="hint">For filtering/tracking only — does not affect the tagged URL.</div>
+        <div class="hint">Used for categorization and tracking. Some campaign types may prefill recommended UTM fields.</div>
         <div class="err" id="err-campaignType">Select a campaign type.</div>
       </div>
       <div>
@@ -187,6 +182,17 @@
         <div class="err" id="err-destUrl">Enter a valid https:// URL.</div>
       </div>
     </div>
+
+    <div class="subsection" id="podcastDetails" style="display:none;">
+      <div class="field-label">Podcast Details</div>
+      <div class="hint" style="margin-top:0; margin-bottom:10px;">Enter the episode number below. We'll use it to prefill the UTM Term (for example, Episode 2 &rarr; ep-2). Then select each channel where the episode will be promoted.</div>
+      <div style="max-width:220px;">
+        <label class="field-label">Episode Number <span class="req">*</span></label>
+        <input type="text" id="episodeNumber" inputmode="numeric" placeholder="e.g. 2">
+        <div class="err" id="err-episodeNumber">Enter a positive whole number (1 or greater).</div>
+      </div>
+    </div>
+    <div class="hint" id="blogHint" style="display:none; margin-top:16px;">Use the final published blog URL as the destination, then select each channel where the blog will be promoted.</div>
 
     <div class="channels-label">Channels <span class="req">*</span></div>
     <div class="channels-err" id="err-channels">Pick at least one channel.</div>
