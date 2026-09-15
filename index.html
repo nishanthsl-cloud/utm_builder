@@ -656,6 +656,9 @@ document.getElementById("loadExampleBtn").addEventListener("click", () => {
   document.getElementById("campaignType").value = EXAMPLE.campaignType;
   document.getElementById("campaignName").value = EXAMPLE.campaignName;
   document.getElementById("destUrl").value = EXAMPLE.destUrl;
+  document.getElementById("episodeNumber").value = "";
+  podcastLastToken = null;
+  updateCampaignTypeUI();
 
   document.querySelectorAll('input[type="checkbox"][data-chan]').forEach(cb => {
     const shouldCheck = cb.dataset.chan === EXAMPLE.channel;
@@ -673,13 +676,17 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   document.getElementById("campaignType").value = "";
   document.getElementById("campaignName").value = "";
   document.getElementById("destUrl").value = "";
+  document.getElementById("episodeNumber").value = "";
+  podcastLastToken = null;
   document.querySelectorAll('input[type="checkbox"][data-chan]').forEach(cb => {
     if (cb.checked) { cb.checked = false; cb.dispatchEvent(new Event("change")); }
   });
   state = {};
+  updateCampaignTypeUI();
   renderResults();
 });
 
+updateCampaignTypeUI();
 renderResults();
 </script>
 </body>
