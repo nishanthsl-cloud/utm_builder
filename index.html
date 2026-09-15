@@ -304,6 +304,15 @@ function buildFinalUrl(destUrl, params) {
   return qs ? `${destUrl}${destUrl.includes("?") ? "&" : "?"}${qs}` : destUrl;
 }
 
+/* ======================= RENDER CAMPAIGN TYPE OPTIONS ======================= */
+const campaignTypeSelect = document.getElementById("campaignType");
+CAMPAIGN_TYPES.forEach(t => {
+  const opt = document.createElement("option");
+  opt.value = t.value;
+  opt.textContent = t.label;
+  campaignTypeSelect.appendChild(opt);
+});
+
 /* ======================= RENDER CHANNEL GRID ======================= */
 const grid = document.getElementById("channelGrid");
 CHANNELS.forEach(ch => {
