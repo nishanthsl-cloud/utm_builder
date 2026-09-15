@@ -385,7 +385,53 @@ function handleSubfieldChange(e) {
   if (!field || !chan) return;
   state[chan] = state[chan] || {};
   state[chan][field] = e.target.value;
+  if (field === "term") state[chan].termAuto = false; // manual edit — stop auto-syncing this Term
   renderResults();
+}
+
+/* ======================= PODCAST EPISODE -> TERM AUTO-FILL ======================= */
+function maybePrefillTerm(chanId) {
+  if (document.getElementById("campaignType").value !== "Podcast") return;
+  const token = podcastLastToken;
+  if (!token) return;
+  const s = state[chanId];
+  if (!s || s.term) return;
+  s.term = token;
+  s.termAuto = true;
+  const input = document.querySelector(`[data-field="term"][data-chan="${chanId}"]`);
+  if (input) input.value = token;
+}
+
+function handleEpisodeNumberChange() {
+  const raw = document.getElementById("episodeNumber").value;
+  const newToken = episodeToken(raw);
+  const oldToken = podcastLastToken;
+
+  if (newToken && oldToken && newToken !== oldToken) {
+    Object.keys(state).forEach(chanId => {
+      const s = state[chanId];
+      if (s && s.termAuto && s.term === oldToken) {
+        s.term = newToken;
+        const input = document.querySelector(`[data-field="term"][data-chan="${chanId}"]`);
+        if (input) input.value = newToken;
+      }
+    });
+  }
+
+  podcastLastToken = newToken;
+
+  if (newToken) {
+    CHANNELS.forEach(ch => {
+      const checkbox = document.querySelector(`input[data-chan="${ch.id}"]`);
+      if (checkbox && checkbox.checked) maybePrefillTerm(ch.id);
+    });
+  }
+}
+
+function updateCampaignTypeUI() {
+  const type = document.getElementById("campaignType").value;
+  document.getElementById("podcastDetails").style.display = type === "Podcast" ? "block" : "none";
+  document.getElementById("blogHint").style.display = type === "Blog" ? "block" : "none";
 }
 
 /* ======================= TOP FIELD LISTENERS ======================= */
