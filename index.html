@@ -435,6 +435,15 @@ function updateCampaignTypeUI() {
 }
 
 /* ======================= TOP FIELD LISTENERS ======================= */
+document.getElementById("campaignType").addEventListener("change", () => {
+  updateCampaignTypeUI();
+  handleEpisodeNumberChange();
+});
+document.getElementById("episodeNumber").addEventListener("input", () => {
+  handleEpisodeNumberChange();
+  renderResults();
+});
+
 ["userName","campaignType","campaignName","destUrl"].forEach(id => {
   document.getElementById(id).addEventListener("input", renderResults);
   document.getElementById(id).addEventListener("change", renderResults);
