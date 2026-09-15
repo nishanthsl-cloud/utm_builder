@@ -490,11 +490,12 @@ function renderResults() {
     if (chValid) anyChannelValid = true;
   });
 
-  const formValid = userName && campaignType && cleanCampaignName && destUrl && isValidHttpsUrl(destUrl) && checkedChannels.length > 0 && anyChannelValid;
+  const formValid = userName && campaignType && cleanCampaignName && destUrl && isValidHttpsUrl(destUrl) && checkedChannels.length > 0 && anyChannelValid && episodeValid;
 
   const resultsArea = document.getElementById("resultsArea");
   if (!formValid) {
-    resultsArea.innerHTML = `<div class="empty-state">Complete the form above — name, campaign type, campaign name, destination URL, and at least one fully-filled channel — to see the tagged URLs.</div>`;
+    const episodeNote = isPodcast && !episodeValid ? " Enter a valid episode number (1 or greater)." : "";
+    resultsArea.innerHTML = `<div class="empty-state">Complete the form above — name, campaign type, campaign name, destination URL, and at least one fully-filled channel — to see the tagged URLs.${episodeNote}</div>`;
     return;
   }
 
