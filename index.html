@@ -468,7 +468,7 @@ function renderResults() {
   const campaignType = document.getElementById("campaignType").value;
   const rawCampaignName = document.getElementById("campaignName").value;
   const destUrl = document.getElementById("destUrl").value.trim();
-  const cleanCampaignName = cleanValue(rawCampaignName);
+  const cleanCampaignNameValue = cleanCampaignName(rawCampaignName);
 
   const checkedChannels = CHANNELS.filter(ch => document.querySelector(`input[data-chan="${ch.id}"]`).checked);
 
