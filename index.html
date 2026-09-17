@@ -173,7 +173,7 @@
       <div>
         <label class="field-label">Campaign Name <span class="req">*</span></label>
         <input type="text" id="campaignName" placeholder="e.g. q3-databricks-webinar">
-        <div class="hint">Must match the SFDC campaign name exactly. Lowercase letters, numbers, hyphens; spaces and underscores auto-convert.</div>
+        <div class="hint">Must match the SFDC campaign name exactly. Lowercase letters, numbers, hyphens, underscores; spaces auto-convert to hyphens.</div>
         <div class="err" id="err-campaignName">Enter a campaign name.</div>
       </div>
       <div>
@@ -479,7 +479,7 @@ function renderResults() {
   // field-level validation display
   setErr("userName", !userName);
   setErr("campaignType", !campaignType);
-  setErr("campaignName", !cleanCampaignName);
+  setErr("campaignName", !cleanCampaignNameValue);
   setErr("destUrl", destUrl && !isValidHttpsUrl(destUrl));
   document.getElementById("err-destUrl").textContent = !destUrl ? "Enter a valid https:// URL." : "Enter a valid https:// URL.";
   if (!destUrl) setErr("destUrl", true);
@@ -503,7 +503,7 @@ function renderResults() {
     if (chValid) anyChannelValid = true;
   });
 
-  const formValid = userName && campaignType && cleanCampaignName && destUrl && isValidHttpsUrl(destUrl) && checkedChannels.length > 0 && anyChannelValid && episodeValid;
+  const formValid = userName && campaignType && cleanCampaignNameValue && destUrl && isValidHttpsUrl(destUrl) && checkedChannels.length > 0 && anyChannelValid && episodeValid;
 
   const resultsArea = document.getElementById("resultsArea");
   if (!formValid) {
@@ -528,7 +528,7 @@ function renderResults() {
       utm_medium: cleanValue(ch.medium),
       utm_term: s.term ? cleanValue(s.term) : "",
       utm_content: s.content ? cleanValue(s.content) : "",
-      utm_campaign: cleanCampaignName
+      utm_campaign: cleanCampaignNameValue
     };
     const finalUrl = buildFinalUrl(destUrl, params);
     return { channel: ch.label, campaignType, destUrl, params, finalUrl };
