@@ -279,6 +279,19 @@ function cleanValue(v, { keepCaseTokens = [] } = {}) {
   return s;
 }
 
+function cleanCampaignName(v) {
+  if (v == null) return "";
+  let s = String(v).trim();
+  s = s.replace(/\s+/g, "-");               // spaces -> hyphen (underscores preserved as-is)
+  s = s.replace(/-+/g, "-");                // collapse repeated hyphens
+  s = s.replace(/_+/g, "_");                // collapse repeated underscores
+  s = s.replace(/^[-_]+|[-_]+$/g, "");       // strip leading/trailing separators
+  // lowercase each token between separators, unless it's an exact-match keep-case token (e.g. region codes)
+  const upperTokens = ["NA","EMEA","APAC"];
+  s = s.replace(/[^-_]+/g, tok => upperTokens.includes(tok.toUpperCase()) ? tok.toUpperCase() : tok.toLowerCase());
+  return s;
+}
+
 function isValidHttpsUrl(v) {
   try {
     const u = new URL(v);
